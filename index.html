@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#DDE4E2" />
+<title>Family Vault</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  body { margin:0; min-height:100vh; background:#DDE4E2; display:flex; justify-content:center;
+         padding:24px 12px; font-family:'Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+         -webkit-font-smoothing:antialiased; }
+  .phone { width:100%; max-width:400px; background:#F5F7F6; border-radius:32px; padding:24px 20px 28px;
+           box-shadow:0 24px 60px rgba(15,61,62,.18); color:#12211F; }
+  .eyebrow { font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:#7C8B87; font-weight:600; margin:0; }
+  .eyebrow.above { margin:16px 0 10px; }
+  .title { font-family:'Sora',sans-serif; font-weight:700; font-size:20px; margin:2px 0 0; line-height:1.3; }
+  .total { font-family:'Sora',sans-serif; font-weight:700; font-size:38px; letter-spacing:-.02em; margin:0; line-height:1.1; }
+  .sub { font-size:12.5px; color:#7C8B87; margin:4px 0 0; }
+  .chips { display:flex; gap:8px; margin:18px 0 6px; }
+  .chip { flex:1; border:none; border-radius:999px; padding:9px 0; font-family:inherit; font-weight:600;
+          font-size:13.5px; cursor:pointer; background:#EAEFED; color:#4A5A56;
+          transition:background .18s ease,color .18s ease; }
+  .chip.on { background:#0F3D3E; color:#EFFBF6; }
+  .chip:focus-visible,.row:focus-visible,.btn:focus-visible { outline:2px solid #0F3D3E; outline-offset:2px; }
+  .ringWrap { position:relative; display:flex; justify-content:center; margin:6px 0 2px; }
+  .donut { width:210px; height:210px; }
+  .ringCenter { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center;
+                justify-content:center; text-align:center; pointer-events:none; }
+  .ringCenter .amt { font-family:'Sora',sans-serif; font-weight:700; font-size:22px; }
+  .ringCenter .lbl { font-size:11.5px; color:#7C8B87; margin-top:2px; }
+  .legend { display:flex; flex-wrap:wrap; gap:6px 14px; justify-content:center; margin:8px 0 4px; }
+  .legend span { display:inline-flex; align-items:center; gap:6px; font-size:12px; color:#4A5A56; font-weight:500; }
+  .dot { width:8px; height:8px; border-radius:50%; display:inline-block; flex-shrink:0; }
+  .sectionHead { display:flex; align-items:baseline; justify-content:space-between; margin:20px 0 10px; }
+  .sectionHead h2 { font-family:'Sora',sans-serif; font-size:15px; font-weight:600; margin:0; }
+  .sectionHead small { font-size:11.5px; color:#7C8B87; }
+  .row { width:100%; display:flex; align-items:center; gap:12px; background:#fff; border:none;
+         border-radius:18px; padding:13px 14px; margin-bottom:10px; cursor:pointer; text-align:left;
+         font-family:inherit; color:inherit; box-shadow:0 2px 8px rgba(15,61,62,.05); transition:transform .15s ease; }
+  .row:hover { transform:translateY(-1px); }
+  .badge { width:44px; height:44px; border-radius:14px; display:flex; align-items:center; justify-content:center;
+           font-family:'Sora',sans-serif; font-weight:700; font-size:11px; flex-shrink:0; }
+  .rowMain { display:block; flex:1; min-width:0; }
+  .rowName { display:block; font-weight:700; font-size:14px; line-height:1.3; }
+  .rowMeta { display:block; font-size:11.5px; color:#7C8B87; margin-top:1px; line-height:1.35; }
+  .rowBal { display:block; font-family:'Sora',sans-serif; font-weight:700; font-size:15px; white-space:nowrap; }
+  .fd { background:#fff; border-radius:20px; padding:15px 16px 16px; margin-bottom:12px; box-shadow:0 2px 8px rgba(15,61,62,.05); }
+  .fdTop { display:flex; align-items:center; gap:12px; }
+  .fdRate { font-family:'Sora',sans-serif; font-size:12px; font-weight:600; color:#0F3D3E;
+            background:#E4F3EE; padding:4px 9px; border-radius:999px; white-space:nowrap; }
+  .track { position:relative; height:10px; border-radius:999px; background:#EDF1EF; margin:14px 0 8px; overflow:hidden; }
+  .fill { position:absolute; top:0; bottom:0; left:0; border-radius:999px; width:0; transition:width .7s ease; }
+  .scale { display:flex; justify-content:space-between; font-size:11px; color:#7C8B87; }
+  .scale b { display:block; color:#12211F; font-weight:600; font-size:11.5px; margin-top:1px; }
+  .fdStats { display:flex; gap:8px; margin-top:12px; }
+  .stat { flex:1; background:#F5F7F6; border-radius:12px; padding:9px 10px; }
+  .stat .k { font-size:10.5px; color:#7C8B87; letter-spacing:.03em; text-transform:uppercase; font-weight:600; }
+  .stat .v { font-family:'Sora',sans-serif; font-weight:700; font-size:13.5px; margin-top:2px; }
+  .split { font-size:11.5px; color:#7C8B87; margin:10px 0 0; }
+  .matured { color:#0F3D3E; font-weight:700; }
+  .hint { text-align:center; font-size:11.5px; color:#9AA8A4; margin-top:12px; line-height:1.5; }
+  .overlay { position:fixed; inset:0; background:rgba(18,33,31,.45); display:flex; align-items:flex-end;
+             justify-content:center; z-index:50; }
+  .overlay[hidden] { display:none; }
+  .sheet { width:100%; max-width:400px; background:#F5F7F6; border-radius:28px 28px 0 0; padding:24px 22px 30px; }
+  .sheet h3 { font-family:'Sora',sans-serif; font-size:17px; margin:0 0 2px; }
+  .sheet p { font-size:12.5px; color:#7C8B87; margin:0 0 14px; }
+  .amtInput { width:100%; font-family:'Sora',sans-serif; font-size:26px; font-weight:700; padding:12px 14px;
+              border-radius:16px; border:2px solid #D6DEDB; background:#fff; color:#12211F; }
+  .amtInput:focus { outline:none; border-color:#0F3D3E; }
+  .sheetBtns { display:flex; gap:10px; margin-top:16px; }
+  .btn { flex:1; border:none; border-radius:999px; padding:13px 0; font-family:inherit; font-weight:700;
+         font-size:14.5px; cursor:pointer; }
+  .btn.primary { background:#0F3D3E; color:#EFFBF6; }
+  .btn.ghost { background:#EAEFED; color:#4A5A56; }
+  @media (prefers-reduced-motion:reduce){ .donut circle,.chip,.row,.fill{transition:none!important;} }
+
+  /* ── lock screen ── */
+  .lock { position:fixed; inset:0; background:#DDE4E2; display:flex; align-items:center;
+          justify-content:center; padding:24px 12px; z-index:100; }
+  .lock[hidden] { display:none; }
+  .lockCard { width:100%; max-width:400px; background:#F5F7F6; border-radius:32px;
+              padding:40px 26px 34px; box-shadow:0 24px 60px rgba(15,61,62,.18); text-align:center; }
+  .lockIcon { width:56px; height:56px; border-radius:20px; background:#0F3D3E; color:#EFFBF6;
+              display:flex; align-items:center; justify-content:center; margin:0 auto 18px; }
+  .lockCard h1 { font-family:'Sora',sans-serif; font-size:21px; font-weight:700; margin:0 0 4px; color:#12211F; }
+  .lockCard p { font-size:13px; color:#7C8B87; margin:0 0 22px; line-height:1.5; }
+  .pw { width:100%; font-family:'Sora',sans-serif; font-size:17px; font-weight:600; letter-spacing:.06em;
+        text-align:center; padding:14px 16px; border-radius:16px; border:2px solid #D6DEDB;
+        background:#fff; color:#12211F; }
+  .pw:focus { outline:none; border-color:#0F3D3E; }
+  .pw.bad { border-color:#E9739B; animation:shake .32s ease; }
+  @keyframes shake { 25%{transform:translateX(-6px)} 50%{transform:translateX(6px)} 75%{transform:translateX(-3px)} }
+  .err { font-size:12.5px; color:#D2417A; margin:10px 0 0; min-height:16px; font-weight:600; }
+  .lockBtn { width:100%; border:none; border-radius:999px; padding:14px 0; margin-top:14px;
+             background:#0F3D3E; color:#EFFBF6; font-family:inherit; font-weight:700; font-size:15px; cursor:pointer; }
+  .remember { display:flex; align-items:center; justify-content:center; gap:8px; margin-top:16px;
+              font-size:12.5px; color:#7C8B87; cursor:pointer; }
+  .remember input { accent-color:#0F3D3E; width:15px; height:15px; }
+  .lockOut { display:block; margin:14px auto 0; border:none; background:none; color:#9AA8A4;
+             font-family:inherit; font-size:12px; font-weight:600; cursor:pointer; padding:6px; }
+  .lockOut:hover { color:#0F3D3E; }
+  @media (prefers-reduced-motion:reduce){ .pw.bad{animation:none;} }
+</style>
+</head>
+<body>
+
+<div class="lock" id="lock">
+  <div class="lockCard">
+    <div class="lockIcon" aria-hidden="true">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+           stroke-linecap="round" stroke-linejoin="round">
+        <rect x="4" y="10" width="16" height="11" rx="2.5"></rect>
+        <path d="M8 10V7a4 4 0 0 1 8 0v3"></path>
+      </svg>
+    </div>
+    <h1>Family Vault</h1>
+    <p>Private — enter the family password to continue.</p>
+    <input class="pw" id="pw" type="password" inputmode="text" autocomplete="current-password"
+           placeholder="Password" aria-label="Family password" />
+    <p class="err" id="err" role="alert"></p>
+    <button class="lockBtn" id="unlockBtn">Unlock</button>
+    <label class="remember"><input type="checkbox" id="remember" checked /> Keep me signed in on this device</label>
+  </div>
+</div>
+
+<main class="phone" id="app" hidden>
+  <p class="eyebrow">Family Vault</p>
+  <h1 class="title">Hello, family 👋</h1>
+
+  <p class="eyebrow above">Total family balance</p>
+  <p class="total" id="familyTotal">—</p>
+  <p class="sub" id="metaLine"></p>
+
+  <div class="chips" id="chips" role="tablist" aria-label="Family member"></div>
+
+  <div class="ringWrap">
+    <svg viewBox="0 0 200 200" class="donut" id="donut" aria-hidden="true"></svg>
+    <div class="ringCenter">
+      <span class="amt" id="ringAmt">—</span>
+      <span class="lbl" id="ringLbl"></span>
+    </div>
+  </div>
+
+  <div class="legend" id="legend"></div>
+  <div id="sections"></div>
+
+  <p class="hint">Tap a savings account to update it after a transfer. Fixed deposit
+  interest updates on its own each day.</p>
+  <button class="lockOut" id="lockOutBtn">Lock this page</button>
+</main>
+
+<div class="overlay" id="overlay" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <h3 id="sheetTitle"></h3>
+    <p id="sheetSub"></p>
+    <input class="amtInput" id="amtInput" inputmode="decimal" aria-label="New balance in Singapore dollars" />
+    <div class="sheetBtns">
+      <button class="btn ghost" id="cancelBtn">Cancel</button>
+      <button class="btn primary" id="saveBtn">Save balance</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var STORAGE_KEY = "family-vault-v5";
+
+  var DEFAULTS = [
+    { id:"uob-one",   bank:"UOB",  name:"UOB One",            type:"savings", color:"#0F4C4E", holders:{ Monica:150000 } },
+    { id:"uob-stash", bank:"UOB",  name:"UOB Stash",          type:"savings", color:"#63D6BA", holders:{ Monica:100001 } },
+    { id:"dbs-sav",   bank:"DBS",  name:"DBS Multiplier",     type:"savings", color:"#E9739B", holders:{ Monica:50000 } },
+    { id:"dbs-fd",    bank:"DBS",  name:"DBS Fixed Deposit",  type:"fd", color:"#A78BFA", holders:{ Monica:19999 },
+      rate:2.45, start:"2025-08-09", end:"2026-08-11" },
+    { id:"uob-fd",    bank:"UOB",  name:"UOB Fixed Deposit",  type:"fd", color:"#7FB5F0", holders:{ Monica:100000 },
+      rate:1.15, start:"2026-04-27", end:"2027-04-27" },
+    { id:"ocbc-fd",   bank:"OCBC", name:"OCBC Fixed Deposit", type:"fd", color:"#F5C64F", holders:{ Monica:52500, Ricky:47500 },
+      rate:1.35, start:"2026-07-27", end:"2027-07-27" }
+  ];
+
+  var MEMBERS = ["All", "Monica", "Ricky"];
+
+  var accounts = clone(DEFAULTS);
+  var member = "All";
+  var updatedAt = null;
+  var editingId = null;
+
+  /* ── helpers ─────────────────────────────────────────── */
+  function clone(o) { return JSON.parse(JSON.stringify(o)); }
+  function money(n, dp) {
+    dp = dp || 0;
+    return "S$" + n.toLocaleString("en-SG", { minimumFractionDigits: dp, maximumFractionDigits: dp });
+  }
+  function principal(a) {
+    var t = 0; for (var k in a.holders) t += a.holders[k]; return t;
+  }
+  function shareOf(a, m) { return m === "All" ? principal(a) : (a.holders[m] || 0); }
+  function day(s) { return new Date(s + "T00:00:00"); }
+  function fmtDate(s) {
+    return day(s).toLocaleDateString("en-SG", { day:"numeric", month:"short", year:"numeric" });
+  }
+  function ink(color) { return color === "#F5C64F" ? "#8a6a10" : color; }
+  function esc(s) {
+    return String(s).replace(/[&<>"]/g, function (c) {
+      return { "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[c];
+    });
+  }
+
+  function fdMath(a, amount) {
+    var start = day(a.start), end = day(a.end), now = new Date();
+    var termDays = Math.max(1, Math.round((end - start) / 86400000));
+    var elapsed = Math.min(Math.max(Math.round((now - start) / 86400000), 0), termDays);
+    var totalInterest = amount * (a.rate / 100) * (termDays / 365);
+    return {
+      termDays: termDays,
+      daysLeft: termDays - elapsed,
+      pct: (elapsed / termDays) * 100,
+      accrued: totalInterest * (elapsed / termDays),
+      totalInterest: totalInterest,
+      atMaturity: amount + totalInterest
+    };
+  }
+
+  /* ── storage (degrades to in-memory if unavailable) ──── */
+  function load() {
+    try {
+      var raw = window.localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      var data = JSON.parse(raw);
+      if (data && data.accounts && data.accounts.length) accounts = data.accounts;
+      if (data && data.updatedAt) updatedAt = data.updatedAt;
+    } catch (e) { /* first run, private mode, or storage blocked */ }
+  }
+  function persist() {
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ accounts: accounts, updatedAt: updatedAt }));
+    } catch (e) { /* keep the session going without saving */ }
+  }
+
+  /* ── render ──────────────────────────────────────────── */
+  function render() {
+    var visible = accounts.filter(function (a) { return shareOf(a, member) > 0; });
+    var total = visible.reduce(function (s, a) { return s + shareOf(a, member); }, 0);
+    var familyTotal = accounts.reduce(function (s, a) { return s + principal(a); }, 0);
+
+    document.getElementById("familyTotal").textContent = money(familyTotal);
+    document.getElementById("metaLine").textContent =
+      accounts.length + " accounts · " +
+      (updatedAt
+        ? "updated " + new Date(updatedAt).toLocaleString("en-SG",
+            { day:"numeric", month:"short", hour:"numeric", minute:"2-digit" })
+        : "opening balances");
+
+    // member chips
+    var chips = document.getElementById("chips");
+    chips.innerHTML = MEMBERS.map(function (m) {
+      return '<button role="tab" aria-selected="' + (m === member) + '" data-member="' + m + '"' +
+             ' class="chip' + (m === member ? " on" : "") + '">' + m + "</button>";
+    }).join("");
+
+    // allocation ring
+    var R = 74, C = 2 * Math.PI * R, gap = visible.length > 1 ? 0.012 : 0, offset = 0.25 * C;
+    var arcs = '<circle cx="100" cy="100" r="' + R + '" fill="none" stroke="#E8EDEB" stroke-width="16"/>';
+    visible.forEach(function (a) {
+      var frac = total > 0 ? shareOf(a, member) / total : 0;
+      var len = Math.max(frac - gap, 0) * C;
+      arcs += '<circle cx="100" cy="100" r="' + R + '" fill="none" stroke="' + a.color +
+              '" stroke-width="16" stroke-linecap="round" stroke-dasharray="' + len + " " + (C - len) +
+              '" stroke-dashoffset="' + offset + '"/>';
+      offset -= frac * C;
+    });
+    document.getElementById("donut").innerHTML = arcs;
+    document.getElementById("ringAmt").textContent = money(total);
+    document.getElementById("ringLbl").textContent =
+      member === "All" ? "All accounts" : member + "'s share";
+
+    // legend
+    document.getElementById("legend").innerHTML = visible.map(function (a) {
+      var pct = total > 0 ? Math.round((shareOf(a, member) / total) * 100) : 0;
+      var short = a.name.replace(" Fixed Deposit", " FD");
+      return '<span><i class="dot" style="background:' + a.color + '"></i>' + esc(short) + " " + pct + "%</span>";
+    }).join("");
+
+    // sections
+    var savings = visible.filter(function (a) { return a.type === "savings"; });
+    var fds = visible.filter(function (a) { return a.type === "fd"; })
+                     .sort(function (x, y) { return day(x.end) - day(y.end); });
+    var html = "";
+
+    if (savings.length) {
+      html += '<div class="sectionHead"><h2>Savings</h2><small>Tap to update</small></div>';
+      savings.forEach(function (a) {
+        html +=
+          '<button class="row" data-edit="' + a.id + '">' +
+            '<span class="badge" style="background:' + a.color + '22;color:' + ink(a.color) + '">' + a.bank + "</span>" +
+            '<span class="rowMain"><span class="rowName">' + esc(a.name) + "</span>" +
+            '<span class="rowMeta">' + esc(Object.keys(a.holders).join(" & ")) + " · flexible</span></span>" +
+            '<span class="rowBal">' + money(shareOf(a, member)) + "</span>" +
+          "</button>";
+      });
+    }
+
+    if (fds.length) {
+      html += '<div class="sectionHead"><h2>Fixed deposits</h2><small>Locked until maturity</small></div>';
+      fds.forEach(function (a) {
+        var amount = shareOf(a, member), f = fdMath(a, amount), done = f.daysLeft <= 0;
+        html +=
+          '<div class="fd">' +
+            '<div class="fdTop">' +
+              '<span class="badge" style="background:' + a.color + '22;color:' + ink(a.color) + '">' + a.bank + "</span>" +
+              '<span class="rowMain"><span class="rowName">' + esc(a.name) + "</span>" +
+              '<span class="rowMeta">' + money(amount) + " placed · 12-month term</span></span>" +
+              '<span class="fdRate">' + a.rate.toFixed(2) + "% p.a.</span>" +
+            "</div>" +
+            '<div class="track" role="img" aria-label="' + Math.round(f.pct) + ' percent of the term elapsed">' +
+              '<div class="fill" style="width:' + f.pct + "%;background:" + a.color + '"></div>' +
+            "</div>" +
+            '<div class="scale">' +
+              "<span>Placed<b>" + fmtDate(a.start) + "</b></span>" +
+              '<span style="text-align:right">' +
+                (done ? '<span class="matured">Matured</span>' : f.daysLeft + " days to go") +
+                "<b>" + fmtDate(a.end) + "</b></span>" +
+            "</div>" +
+            '<div class="fdStats">' +
+              '<div class="stat"><div class="k">Interest earned</div><div class="v">' + money(f.accrued, 2) + "</div></div>" +
+              '<div class="stat"><div class="k">' + (done ? "Value now" : "Value at maturity") +
+                '</div><div class="v">' + money(f.atMaturity, 2) + "</div></div>" +
+            "</div>" +
+            (member === "All" && Object.keys(a.holders).length > 1
+              ? '<p class="split">Split — ' + Object.keys(a.holders).map(function (k) {
+                  return esc(k) + " " + money(a.holders[k]);
+                }).join(" · ") + "</p>"
+              : "") +
+          "</div>";
+      });
+    }
+
+    document.getElementById("sections").innerHTML = html;
+  }
+
+  /* ── edit sheet ──────────────────────────────────────── */
+  var overlay = document.getElementById("overlay");
+  var amtInput = document.getElementById("amtInput");
+
+  function openSheet(id) {
+    var a = accounts.filter(function (x) { return x.id === id; })[0];
+    if (!a) return;
+    editingId = id;
+    document.getElementById("sheetTitle").textContent = a.name;
+    document.getElementById("sheetSub").textContent =
+      Object.keys(a.holders).join(" & ") + " · enter the new balance in SGD";
+    amtInput.value = String(shareOf(a, member));
+    overlay.hidden = false;
+    amtInput.focus();
+    amtInput.select();
+  }
+
+  function closeSheet() { overlay.hidden = true; editingId = null; }
+
+  function saveBalance() {
+    var a = accounts.filter(function (x) { return x.id === editingId; })[0];
+    var val = Number(String(amtInput.value).replace(/[^0-9.]/g, ""));
+    if (a && !isNaN(val) && val >= 0) {
+      var keys = Object.keys(a.holders);
+      if (member !== "All" && keys.indexOf(member) !== -1) {
+        a.holders[member] = val;                      // one person's share
+      } else if (keys.length === 1) {
+        a.holders[keys[0]] = val;
+      } else {
+        var old = principal(a);                       // joint account: keep the ratio
+        keys.forEach(function (k) { a.holders[k] = Math.round(val * (a.holders[k] / old)); });
+      }
+      updatedAt = new Date().toISOString();
+      persist();
+      render();
+    }
+    closeSheet();
+  }
+
+  /* ── events ──────────────────────────────────────────── */
+  document.addEventListener("click", function (e) {
+    var chip = e.target.closest("[data-member]");
+    if (chip) { member = chip.getAttribute("data-member"); render(); return; }
+    var row = e.target.closest("[data-edit]");
+    if (row) { openSheet(row.getAttribute("data-edit")); return; }
+    if (e.target === overlay) closeSheet();
+  });
+  document.getElementById("cancelBtn").addEventListener("click", closeSheet);
+  document.getElementById("saveBtn").addEventListener("click", saveBalance);
+  amtInput.addEventListener("keydown", function (e) { if (e.key === "Enter") saveBalance(); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !overlay.hidden) closeSheet(); });
+
+  /* ── password gate ───────────────────────────────────
+     Two independent hashes of the family password, so the
+     password itself isn't sitting in the source. This keeps
+     casual eyes out — it is not bank-grade protection.     */
+  var PW_A = 1150247583, PW_B = 4081923262;
+  var AUTH_KEY = "family-vault-unlocked";
+
+  function hashA(s) {                       // djb2-xor
+    var h = 5381;
+    for (var i = 0; i < s.length; i++) h = ((h * 33) ^ s.charCodeAt(i)) >>> 0;
+    return h;
+  }
+  function hashB(s) {                       // sdbm
+    var h = 0;
+    for (var i = 0; i < s.length; i++) h = (s.charCodeAt(i) + (h << 6) + (h << 16) - h) >>> 0;
+    return h;
+  }
+  function correct(s) { return hashA(s) === PW_A && hashB(s) === PW_B; }
+
+  var lock = document.getElementById("lock");
+  var app = document.getElementById("app");
+  var pwInput = document.getElementById("pw");
+  var errBox = document.getElementById("err");
+
+  function unlock() {
+    lock.hidden = true;
+    app.hidden = false;
+    render();
+  }
+
+  function tryUnlock() {
+    var val = pwInput.value.trim();
+    if (correct(val)) {
+      try {
+        if (document.getElementById("remember").checked) {
+          window.localStorage.setItem(AUTH_KEY, "1");
+        } else {
+          window.sessionStorage.setItem(AUTH_KEY, "1");
+        }
+      } catch (e) { /* storage blocked — unlock for this session only */ }
+      errBox.textContent = "";
+      pwInput.value = "";
+      unlock();
+    } else {
+      errBox.textContent = "That password doesn't match. Try again.";
+      pwInput.classList.add("bad");
+      pwInput.select();
+      setTimeout(function () { pwInput.classList.remove("bad"); }, 400);
+    }
+  }
+
+  function alreadyUnlocked() {
+    try {
+      return window.localStorage.getItem(AUTH_KEY) === "1" ||
+             window.sessionStorage.getItem(AUTH_KEY) === "1";
+    } catch (e) { return false; }
+  }
+
+  function relock() {
+    try { window.localStorage.removeItem(AUTH_KEY); window.sessionStorage.removeItem(AUTH_KEY); } catch (e) {}
+    app.hidden = true;
+    lock.hidden = false;
+    pwInput.focus();
+  }
+
+  document.getElementById("unlockBtn").addEventListener("click", tryUnlock);
+  pwInput.addEventListener("keydown", function (e) { if (e.key === "Enter") tryUnlock(); });
+  document.getElementById("lockOutBtn").addEventListener("click", relock);
+
+  load();
+  if (alreadyUnlocked()) { unlock(); } else { pwInput.focus(); }
+})();
+</script>
+</body>
+</html>
