@@ -70,11 +70,9 @@
   .rowName { display:block; font-weight:700; font-size:14px; line-height:1.3; }
   .rowMeta { display:block; font-size:11.5px; color:#7C8B87; margin-top:1px; line-height:1.35; }
   .rowBal { display:block; font-family:'Sora',sans-serif; font-weight:700; font-size:15px; white-space:nowrap; }
-  .fd { background:#fff; border-radius:20px; padding:15px 16px 16px 20px; margin-bottom:12px;
+  .fd { background:#fff; border-radius:20px; padding:15px 14px 16px 18px; margin-bottom:12px;
         box-shadow:inset 4px 0 0 var(--accent, transparent), 0 2px 8px rgba(15,61,62,.05); }
   .fdTop { display:flex; align-items:center; gap:12px; }
-  .fdRate { font-family:'Sora',sans-serif; font-size:12px; font-weight:600; color:#0F3D3E;
-            background:#E4F3EE; padding:4px 9px; border-radius:999px; white-space:nowrap; }
   .track { position:relative; height:10px; border-radius:999px; background:#EDF1EF; margin:14px 0 8px; overflow:hidden; }
   .fill { position:absolute; top:0; bottom:0; left:0; border-radius:999px; width:0; transition:width .7s ease; }
   .scale { display:flex; justify-content:space-between; font-size:11px; color:#7C8B87; }
@@ -230,7 +228,7 @@
 
   /* Bump this line whenever you re-deploy — it shows at the bottom of the
      page, so everyone can confirm they're looking at the newest version. */
-  var BUILD = "v7 · 27 Jul 2026";
+  var BUILD = "v8 · 27 Jul 2026";
 
   /* Home-screen apps hold on to the old HTML aggressively. The refresh
      button clears any caches and reloads with a fresh query string, which
@@ -410,8 +408,9 @@
           '<div class="fd" style="--accent:' + a.color + '">' +
             '<div class="fdTop">' + badgeHtml(a) +
               '<span class="rowMain"><span class="rowName">' + esc(a.name) + "</span>" +
-              '<span class="rowMeta">' + money(amount) + " placed · 12-month term</span></span>" +
-              '<span class="fdRate">' + a.rate.toFixed(2) + "% p.a.</span>" +
+              '<span class="rowMeta">' + esc(Object.keys(a.holders).join(" & ")) +
+                " · " + a.rate.toFixed(2) + "% p.a.</span></span>" +
+              '<span class="rowBal">' + money(amount) + "</span>" +
             "</div>" +
             '<div class="track" role="img" aria-label="' + Math.round(f.pct) + ' percent of the term elapsed">' +
               '<div class="fill" style="width:' + f.pct + "%;background:" + a.color + '"></div>' +
